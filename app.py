@@ -96,8 +96,8 @@ if st.button('Generate token'):
     if len(clientid) > 0:
 
         payload = {
-            "cliendid" : clientid,
-            "secret": secret,
+            "clientid" : clientid,
+            "clientsecret": secret,
             "url": url
         }
         encoded_jwt = jwt.encode(payload, "secret", algorithm="HS256")
