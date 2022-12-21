@@ -1,9 +1,7 @@
 import streamlit as st
 import json
+import jwt
 
-from oauthlib.oauth2 import BackendApplicationClient
-from requests_oauthlib import OAuth2Session
-from requests.auth import HTTPBasicAuth
 import pandas as pd
 import requests
 
@@ -96,12 +94,22 @@ except AttributeError:
 
 if st.button('Generate token'):
     if len(clientid) > 0:
-        auth = HTTPBasicAuth(clientid, secret)
-        client = BackendApplicationClient(client_id=clientid)
-        oauth = OAuth2Session(client=client)
-        token = oauth.fetch_token(token_url=url, auth=auth)
 
-        bearer_token = token["access_token"]
+        payload = {
+            "cliendid" : clientid,
+            "secret": secret,
+            "url": url
+        }
+        encoded_jwt = jwt.encode(payload, "secret", algorithm="HS256")
+        targetURl = "https://migrationtoolbackend.cfapps.eu20.hana.ondemand.com/token?token=" + encoded_jwt
+        payload={}
+        headers = {
+        'apiToken': '123'
+        }
+        response = requests.request("GET", targetURl, headers=headers, data=payload)
+        
+        bearer_token = response.text
+
         headers= { 'Authorization': 'Bearer ' + bearer_token, 'Content-Type': 'application/json'}
 
         st.success("Token was generated")
